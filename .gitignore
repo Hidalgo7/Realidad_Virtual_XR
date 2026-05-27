@@ -5,7 +5,6 @@ android/
 # Exports / builds
 builds/
 exports/
-*.apk
 *.aab
 *.exe
 *.pck
