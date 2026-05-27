@@ -1,0 +1,297 @@
+\documentclass[12pt, a4paper]{article}
+
+% ─── Paquetes ────────────────────────────────────────────────────────────────
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{parskip}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{caption}
+
+% ─── Cabecera / Pie ──────────────────────────────────────────────────────────
+\pagestyle{fancy}
+\setlength{\headheight}{14.5pt}
+\fancyhf{}
+\rhead{Realidad Virtual y Aumentada}
+\lhead{EHU/UPV}
+\cfoot{\thepage}
+
+% ─── Metadatos del documento ─────────────────────────────────────────────────
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue!60!black,
+    urlcolor=blue!60!black,
+    pdftitle={Memoria Proyecto RVA - DeliveryVR},
+    pdfauthor={Iker Hidalgo, Adriana Bernal}
+}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\begin{document}
+\pagenumbering{gobble}
+
+% ─── Portada ─────────────────────────────────────────────────────────────────
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+    {\large Universidad del País Vasco / Euskal Herriko Unibertsitatea (UPV/EHU)}\\[0.5em]
+    {\large Máster en Ingeniería Computacional y Sistemas Inteligentes}\\[0.5em]
+    {\large Asignatura: Realidad Virtual y Aumentada}\\[3cm]
+
+    {\Huge \textbf{DeliveryVR}}\\[0.8em]
+    {\LARGE Realidad Virtual y Aumentada}\\[3cm]
+
+    \begin{tabular}{rl}
+        \textbf{Autores:} & Iker Hidalgo \\
+                          & Adriana Bernal \\[1em]
+        \textbf{Curso:}   & 2025--2026 \\
+    \end{tabular}
+
+    \vfill
+    {\large \today}
+\end{titlepage}
+\pagenumbering{arabic}
+
+% ─── Índice ──────────────────────────────────────────────────────────────────
+\tableofcontents
+\newpage
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Introducción}
+
+Este documento describe el desarrollo de \textbf{DeliveryVR}, un videojuego de realidad virtual creado como proyecto para la asignatura de Realidad Virtual y Aumentada del Máster en Ingeniería Computacional y Sistemas Inteligentes de la UPV/EHU.
+
+El objetivo principal del proyecto ha sido diseñar una experiencia inmersiva orientada a dispositivos de realidad virtual, explorando mecánicas basadas en la interacción mediante controladores y movimientos físicos del usuario. Para ello, se ha implementado un prototipo arcade en el que el jugador genera, agarra y lanza paquetes desde un entorno urbano recorrido por un camión, intentando depositarlos en una zona de entrega señalizada.
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Descripción del proyecto}
+
+\subsection{Concepto y jugabilidad}
+
+En DeliveryVR, el jugador asume el rol de un repartidor dentro de una ciudad de estilo \textit{low-poly}. La escena principal contiene un camión que se desplaza de forma autónoma por una ruta definida en el entorno, una zona de entrega reutilizable y un sistema XR completo con cámara, controladores, manos virtuales y cuerpo del jugador.
+
+La mecánica central consiste en generar cajas con la mano derecha, agarrarlas con los controladores y soltarlas para lanzarlas hacia la zona de entrega. La zona objetivo está marcada con un plano verde translúcido, luz, brillo pulsante, bordes punteados generados proceduralmente y un contador visible que indica cuántas cajas se han entregado respecto al total requerido.
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Generación de cajas}: Al pulsar \texttt{trigger\_click} en el mando derecho se instancia \texttt{box.tscn} en la posición del controlador y se recoge automáticamente mediante \texttt{FunctionPickup}.
+    \item \textbf{Agarre}: Con \texttt{grip\_click}, tanto la mano derecha como la izquierda pueden agarrar la caja cercana más próxima dentro de un radio aproximado de 0,25 metros.
+    \item \textbf{Lanzamiento}: Al soltar el gatillo o el agarre, la caja se libera como cuerpo rígido. La interacción se apoya en los componentes \texttt{XRToolsPickable} y \texttt{FunctionPickup} de Godot XR Tools.
+    \item \textbf{Puntuación}: Cada caja que entra en la zona de entrega suma 100 puntos al marcador global. Además, cada zona requiere completar entre 1 y 5 entregas, valor elegido aleatoriamente al iniciar la escena.
+    \item \textbf{Movimiento del vehículo}: El camión se desplaza siguiendo una curva \texttt{Path3D} mediante un nodo \texttt{PathFollow3D}. El cuerpo animable del camión se sincroniza con la ruta usando \texttt{RemoteTransform3D}.
+\end{itemize}
+
+\subsection{Entorno}
+
+El escenario es una ciudad de estilo \textit{low-poly} compuesta por edificios, carreteras rectas, curvas, aceras, farolas, vegetación y elementos urbanos. La escena principal escala y organiza estos módulos para formar un circuito cerrado, acompañado por una iluminación direccional y un cielo panorámico cargado desde \texttt{assets/sky3.jpg}. Este estilo visual mantiene baja la complejidad geométrica y resulta adecuado para realidad virtual, donde la fluidez es especialmente importante.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Tecnología utilizada}
+
+\subsection{Motor y plataforma}
+
+El proyecto se ha desarrollado con \textbf{Godot Engine 4.5}. La configuración del proyecto activa OpenXR, usa el renderizador móvil y define \texttt{main.tscn} como escena principal. El prototipo está orientado a visores compatibles con OpenXR, con soporte específico para dispositivos de fabricantes como Meta gracias al complemento de vendors.
+
+\subsection{Complementos empleados}
+
+Para integrar las funcionalidades básicas relacionadas con el hardware de realidad virtual nos hemos apoyado en las dos librerías de referencia para el desarrollo de realidad virtual en Godot:
+
+\begin{itemize}
+    \item \textbf{Godot XR Tools.} Proporciona la estructura base para proyectos XR: origen de la cámara, controladores, manos virtuales y utilidades de interacción.
+    \item \textbf{Godot OpenXR Vendors.} Extiende el soporte OpenXR a fabricantes concretos (Meta, Pico, Magic Leap, Khronos, Android XR), facilitando el despliegue en distintos visores.
+\end{itemize}
+
+\subsection{Lenguaje de programación}
+
+La lógica del juego está desarrollada en \textbf{GDScript}, el lenguaje propio de Godot, especialmente pensado para el desarrollo ágil de videojuegos.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Arquitectura y estructura del proyecto}
+
+\subsection{Organización de ficheros}
+
+El proyecto se organiza en tres directorios principales:
+
+\begin{itemize}
+    \item \texttt{assets}. Recursos 3D del entorno urbano, el camión, cajas, elementos de
+    mobiliario urbano y la imagen panorámica utilizada como cielo.
+    \item \texttt{scenes}. Contiene todas las escenas del juego: la escena principal, el camión,
+    la zona de puntuación, las cajas, los segmentos de carretera, el origen XR y las manos virtuales.
+    \item \texttt{scripts}. Aloja los scripts de lógica: gestor de partida, controlador de la
+    mano derecha, controlador de la mano izquierda, seguimiento del camión, efectos visuales y detección de puntuación.
+\end{itemize}
+
+\subsection{Lógica principal}
+
+La funcionalidad del prototipo se concentra en varios scripts propios escritos en GDScript. Las
+escenas definen la estructura de nodos, modelos y colisiones, mientras que los scripts coordinan
+la interacción XR, el movimiento del camión, la puntuación y la retroalimentación visual.
+
+\begin{itemize}[leftmargin=*]
+
+    \item \textbf{Mano derecha}: El script \texttt{right\_hand\_controller.gd} concentra la
+    interacción principal. Extiende \texttt{XRController3D} y se conecta a las señales de
+    pulsación y liberación del controlador derecho. Cuando recibe \texttt{trigger\_click},
+    instancia la escena exportada \texttt{box\_scene}, la añade a la escena actual, la coloca
+    en la transformación global de la mano y busca dentro de ella el \texttt{RigidBody3D}
+    agarrable. Después llama de forma diferida a \texttt{\_pick\_up\_object} sobre el nodo
+    \texttt{FunctionPickup} de Godot XR Tools, lo que hace que la caja quede sujeta a la mano.
+
+    \item \textbf{Agarre y suelta de objetos}: Los scripts de ambas manos implementan una
+    búsqueda de objetos cercanos mediante \texttt{\_find\_pickable()}. El método recorre los hijos de la escena actual, filtra los
+    nodos de tipo \texttt{XRToolsPickable} y selecciona el más cercano al marcador
+    \texttt{GrabDetectPoint} dentro de un radio de 0,25 metros. Al soltar el botón, ambos
+    scripts llaman a \texttt{drop\_object()} en \texttt{FunctionPickup}, devolviendo la caja a
+    la simulación física.
+
+    \item \textbf{Mano izquierda}: \texttt{left\_hand\_controller.gd} implementa la versión de apoyo de la
+    interacción. La mano izquierda no crea nuevas cajas, pero sí puede agarrar y soltar cajas
+    existentes con \texttt{grip\_click}. Esta separación permite que la mano derecha actúe como
+    generadora principal y que ambas manos puedan manipular objetos físicos.
+
+    \item \textbf{\texttt{score\_area.gd}}: Controla la lógica interna de cada zona de entrega.
+    En \texttt{\_ready()} asigna aleatoriamente el número máximo de cajas necesarias mediante
+    \texttt{randi\_range(1, 5)}, actualiza el texto local y conecta la señal
+    \texttt{body\_entered}. Cuando entra un cuerpo del grupo \texttt{cajas}, incrementa el
+    contador, suma los puntos configurados, elimina la caja con \texttt{queue\_free()} y, si se
+    alcanza el objetivo, marca la zona como completada desactivando \texttt{monitoring}.
+
+    \item \textbf{\texttt{GameManager.gd}}: Funciona como \textit{autoload} global y centraliza
+    la puntuación de la partida. Mantiene la variable \texttt{score}, busca dinámicamente el
+    \texttt{Label3D} del visor y actualiza el texto del marcador cada vez que una zona invoca
+    \texttt{add\_score(points)}. De este modo, la zona de entrega no necesita conocer la
+    estructura completa de la interfaz XR.
+
+    \item \textbf{\texttt{path\_follow\_3d.gd}}: Gestiona el movimiento automático del camión.
+    El script extiende \texttt{PathFollow3D} y, en cada \texttt{\_physics\_process}, incrementa
+    \texttt{progress} usando la velocidad exportada. La escena principal usa este nodo sobre un
+    \texttt{Path3D} y sincroniza el cuerpo animable del camión mediante \texttt{RemoteTransform3D}.
+    El script también incluye variables exportadas para referenciar ruedas y calcular su giro a
+    partir de la velocidad y del radio configurado.
+
+    \item \textbf{\texttt{floor\_glow.gd}}: Añade retroalimentación visual a la zona de entrega.
+    En \texttt{\_ready()} obtiene el material activo del plano y, en cada fotograma, modifica
+    el multiplicador de energía de emisión con una función sinusoidal basada en
+    \texttt{Time.get\_ticks\_msec()}. El resultado es un brillo verde pulsante que facilita
+    localizar el objetivo.
+
+    \item \textbf{\texttt{border\_lines.gd}}: Genera de forma procedural los bordes punteados
+    de la zona. A partir de los parámetros exportados \texttt{width}, \texttt{depth},
+    \texttt{dash}, \texttt{gap} y \texttt{height}, crea pequeños \texttt{MeshInstance3D} con
+    \texttt{BoxMesh} alrededor de los cuatro lados. Así se consigue delimitar el área sin
+    depender de una textura externa.
+
+\end{itemize}
+
+En la versión actual, otros scripts como \texttt{main.gd}, \texttt{player.gd} o
+\texttt{boxgenerator.gd} no concentran lógica relevante de juego; la inicialización principal se
+resuelve sobre todo desde las escenas y desde los scripts descritos anteriormente.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Mecánicas de realidad virtual}
+
+\subsection{Interacción con las manos}
+
+Una de las características más relevantes del proyecto desde el punto de vista de la realidad
+virtual es la manipulación física de objetos. Las cajas son cuerpos rígidos agarrables mediante
+Godot XR Tools, por lo que el jugador no interactúa con un puntero abstracto, sino con objetos
+situados físicamente en el espacio. La acción de soltar la caja después de mover la mano permite
+realizar lanzamientos naturales hacia la zona de entrega.
+
+El prototipo distingue dos formas de interacción: la mano derecha puede generar nuevas cajas con
+el gatillo, mientras que ambas manos pueden agarrar objetos cercanos con el botón de agarre. Esta
+separación facilita el flujo de juego, ya que una mano puede actuar como generadora principal y la
+otra como apoyo para manipular cajas ya presentes en la escena.
+
+\subsection{Confort y mareo}
+
+El desplazamiento principal del entorno se plantea mediante el camión, que avanza de forma suave
+y continua siguiendo una ruta predefinida. Esto permite construir una experiencia de movimiento
+pasivo más predecible que una locomoción libre rápida.
+
+La escena XR mantiene, además, proveedores de movimiento de Godot XR Tools para facilitar pruebas
+y ajustes durante el desarrollo: \texttt{MovementDirect} en la mano izquierda, con velocidad máxima
+de 1,75, y \texttt{MovementTurn} en la mano derecha, configurado para giro por pasos. En una versión
+final orientada exclusivamente al confort, estos controles podrían limitarse o desactivarse según
+el tipo de experiencia deseada.
+
+\subsection{Retroalimentación visual}
+
+\begin{itemize}[leftmargin=*]
+    \item Las zonas de entrega emiten un brillo pulsante verde que indica al jugador dónde debe
+    apuntar incluso en movimiento.
+    \item Los bordes punteados de las zonas refuerzan la delimitación espacial del área objetivo.
+    \item El contador local de cada zona muestra el progreso con el formato entregadas/objetivo.
+    \item El marcador global está anclado a la cámara XR mediante un \texttt{Label3D}, por lo que
+    permanece visible en el visor.
+    \item Las cajas desaparecen al entrar en una zona válida, confirmando visualmente la entrega.
+\end{itemize}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Entorno 3D y arte}
+
+El entorno urbano está compuesto por activos \textit{low-poly} que incluyen:
+
+\begin{itemize}[leftmargin=*]
+    \item Variantes de edificios sin base utilizadas para poblar las manzanas de la ciudad.
+    \item El camión principal, con colisiones compuestas y modelos visuales para carrocería,
+    ruedas, frenos y cajas decorativas en la parte trasera.
+    \item Elementos de mobiliario urbano y decoración, como farolas, contenedores y arbustos.
+    \item Segmentos modulares de carretera recta y curva, junto con piezas de acera.
+    \item Cajas interactivas basadas en el modelo \texttt{box\_A.fbx}.
+\end{itemize}
+
+El uso de un estilo artístico coherente y de baja complejidad geométrica es una decisión
+consciente orientada a garantizar un rendimiento fluido en visores de realidad virtual, donde
+mantener al menos 72 fotogramas por segundo es imprescindible para una experiencia cómoda.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Resultados y conclusiones}
+
+El resultado actual es un prototipo de realidad virtual funcional que cumple la mecánica base
+planteada: se inicializa OpenXR, se muestran manos virtuales, el jugador puede generar cajas con
+la mano derecha, agarrarlas con cualquiera de las dos manos, soltarlas como objetos físicos y
+sumar puntuación al introducirlas en la zona de entrega mientras el camión recorre la ciudad.
+
+Desde el punto de vista académico, el proyecto ha permitido aplicar de forma práctica
+conceptos clave de la asignatura:
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Presencia e inmersión}: La combinación de manos virtuales representadas
+    fielmente y la física realista del lanzamiento contribuyen a la sensación de estar
+    realmente sobre el camión.
+    \item \textbf{Confort en VR}: El diseño prioriza un movimiento principal suave y predecible,
+    aunque conserva locomoción directa y giro por pasos como herramientas útiles de prueba.
+    \item \textbf{Interacción natural}: El uso del movimiento físico real del controlador para
+    determinar el impulso de lanzamiento es un ejemplo de interfaz natural de usuario (\textit{NUI})
+    aplicada a entornos virtuales.
+    \item \textbf{Estándares de la industria}: La integración con OpenXR y las herramientas de
+    Godot XR Tools reflejan el uso de estándares y bibliotecas de referencia actuales en el
+    desarrollo de aplicaciones XR.
+\end{itemize}
+
+Como líneas de trabajo futuro se podrían contemplar: añadir más instancias de \texttt{ScoreZone}
+en distintas posiciones del recorrido, incorporar un contador de tiempo visible en el visor,
+introducir cajas de diferentes tamaños con distinto valor de puntuación, asignar valores de
+puntos específicos por zona, incorporar efectos de sonido espacial al lanzamiento e impacto,
+conectar visualmente las ruedas del camión al script de avance, o ampliar el recorrido con nuevas
+secciones de ciudad y obstáculos dinámicos.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section*{Referencias}
+\addcontentsline{toc}{section}{Referencias}
+
+\begin{itemize}[leftmargin=*]
+    \item Godot Engine Documentation. \textit{XR in Godot}. \url{https://docs.godotengine.org/en/stable/tutorials/xr/index.html}
+    \item Godot XR Tools. \textit{GitHub Repository}. \url{https://github.com/GodotVR/godot-xr-tools}
+    \item Khronos Group. \textit{OpenXR Specification}. \url{https://www.khronos.org/openxr/}
+    \item LaViola, J. J. et al. \textit{3D User Interfaces: Theory and Practice}. 2nd ed. Addison-Wesley, 2017.
+\end{itemize}
+
+\end{document}

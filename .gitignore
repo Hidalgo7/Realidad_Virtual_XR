@@ -1,0 +1,27 @@
+# Godot
+.godot/
+android/
+
+# Exports / builds
+builds/
+exports/
+*.apk
+*.aab
+*.exe
+*.pck
+*.zip
+
+# LaTeX
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.toc
+*.synctex.gz
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

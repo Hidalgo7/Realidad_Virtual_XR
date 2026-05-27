@@ -1,0 +1,49 @@
+[gd_scene load_steps=8 format=3 uid="uid://dq50i6jaqn0bs"]
+
+[ext_resource type="Script" uid="uid://dp6mknyfadrx3" path="res://scripts/score_zone.gd" id="1_34hdw"]
+[ext_resource type="Script" uid="uid://o1si38kg67a0" path="res://scripts/score_area.gd" id="1_ho74m"]
+[ext_resource type="Script" uid="uid://qrovni4e0ind" path="res://scripts/border_lines.gd" id="2_t6bev"]
+[ext_resource type="Script" uid="uid://bo7ywtfrdaiq6" path="res://scripts/floor_glow.gd" id="3_slei3"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_t6bev"]
+size = Vector3(1.9815979, 0.2107544, 1.9968262)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_slei3"]
+transparency = 1
+albedo_color = Color(0.19607843, 0.8039216, 0.19215687, 0.7058824)
+emission_enabled = true
+emission = Color(0, 1, 0, 1)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_34hdw"]
+material = SubResource("StandardMaterial3D_slei3")
+
+[node name="ScoreZone" type="Node3D"]
+script = ExtResource("1_34hdw")
+
+[node name="Area3D" type="Area3D" parent="."]
+collision_layer = 196609
+collision_mask = 196609
+script = ExtResource("1_ho74m")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5258789e-05, 0.09762573, -0.00012207031)
+shape = SubResource("BoxShape3D_t6bev")
+
+[node name="BorderLines" type="Node3D" parent="."]
+script = ExtResource("2_t6bev")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("PlaneMesh_34hdw")
+script = ExtResource("3_slei3")
+
+[node name="OmniLight3D" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.16771024, 0)
+light_color = Color(0.19607843, 0.8039216, 0.19215687, 1)
+omni_range = 1.0
+
+[node name="Label3D" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+billboard = 1
+fixed_size = true
+text = "0/3"
+font_size = 40

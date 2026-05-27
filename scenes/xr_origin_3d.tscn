@@ -1,0 +1,76 @@
+[gd_scene load_steps=14 format=3 uid="uid://s7o6bo8wokpi"]
+
+[ext_resource type="Environment" uid="uid://ckiwtcdsam7ed" path="res://addons/godot-xr-tools/staging/staging_env.tres" id="1_4xi54"]
+[ext_resource type="PackedScene" uid="uid://btknduttnmoxf" path="res://addons/godot-xr-tools/misc/vr_common_shader_cache.tscn" id="2_pxd65"]
+[ext_resource type="PackedScene" uid="uid://xa7jq6plej7s" path="res://scenes/left_fullglove_low.tscn" id="3_0t3sa"]
+[ext_resource type="Script" uid="uid://b7ee0xs47i2t0" path="res://scripts/left_hand_controller.gd" id="3_xllm5"]
+[ext_resource type="PackedScene" uid="uid://b4ysuy43poobf" path="res://addons/godot-xr-tools/functions/function_pickup.tscn" id="4_j2fxx"]
+[ext_resource type="PackedScene" uid="uid://8denoswi3lbl" path="res://scenes/right_fullglove_low.tscn" id="4_lnt0p"]
+[ext_resource type="PackedScene" uid="uid://bl2nuu3qhlb5k" path="res://addons/godot-xr-tools/functions/movement_direct.tscn" id="5_hg5dl"]
+[ext_resource type="Script" uid="uid://c3h06foib8vr1" path="res://scripts/right_hand_controller.gd" id="6_2ofhi"]
+[ext_resource type="PackedScene" uid="uid://diyu06cw06syv" path="res://addons/godot-xr-tools/player/player_body.tscn" id="6_j2fxx"]
+[ext_resource type="PackedScene" uid="uid://b6bk2pj8vbj28" path="res://addons/godot-xr-tools/functions/movement_turn.tscn" id="7_dd1ma"]
+[ext_resource type="Script" uid="uid://cjfu28jmrajlo" path="res://addons/godot-xr-tools/overrides/ground_physics_settings.gd" id="7_g4cwv"]
+[ext_resource type="PackedScene" uid="uid://cuqttijjmoyh6" path="res://scenes/box.tscn" id="9_wsdia"]
+
+[sub_resource type="Resource" id="Resource_4hrip"]
+script = ExtResource("7_g4cwv")
+metadata/_custom_type_script = "uid://cjfu28jmrajlo"
+
+[node name="XROrigin3D" type="XROrigin3D"]
+
+[node name="XRCamera3D" type="XRCamera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0013035983, 0, 0)
+environment = ExtResource("1_4xi54")
+
+[node name="VRCommonShaderCache" parent="XRCamera3D" instance=ExtResource("2_pxd65")]
+
+[node name="HUDScoreLabel" type="Label3D" parent="XRCamera3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -1.5)
+fixed_size = true
+text = "Score: 0"
+
+[node name="LeftHandController" type="XRController3D" parent="."]
+tracker = &"left_hand"
+pose = &"grip"
+script = ExtResource("3_xllm5")
+
+[node name="LeftHand" parent="LeftHandController" instance=ExtResource("3_0t3sa")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.04120667, 0, 0)
+
+[node name="FunctionPickup" parent="LeftHandController" instance=ExtResource("4_j2fxx")]
+transform = Transform3D(1, 0, 0, 0, 0.70710677, 0.70710677, 0, -0.70710677, 0.70710677, 0, 0, 0)
+
+[node name="MovementDirect" parent="LeftHandController" instance=ExtResource("5_hg5dl")]
+max_speed = 1.75
+strafe = true
+
+[node name="GrabDetectPoint" type="Marker3D" parent="LeftHandController"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.031498387, 0, 0)
+
+[node name="RightHandController" type="XRController3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.031498387, 0, 0)
+tracker = &"right_hand"
+pose = &"grip"
+script = ExtResource("6_2ofhi")
+box_scene = ExtResource("9_wsdia")
+
+[node name="RightHand" parent="RightHandController" instance=ExtResource("4_lnt0p")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0006971806, 0, 0)
+
+[node name="FunctionPickup" parent="RightHandController" instance=ExtResource("4_j2fxx")]
+transform = Transform3D(1, 0, 0, 0, 0.70710677, 0.70710677, 0, -0.70710677, 0.70710677, 0, 0, 0)
+
+[node name="MovementTurn" parent="RightHandController" instance=ExtResource("7_dd1ma")]
+turn_mode = 2
+
+[node name="GrabDetectPoint" type="Marker3D" parent="RightHandController"]
+
+[node name="PlayerBody" parent="." instance=ExtResource("6_j2fxx")]
+collision_layer = 524289
+collision_mask = 1
+floor_snap_length = 1.0
+platform_floor_layers = 4294901760
+safe_margin = 0.05
+player_height_max = 1.0
+physics = SubResource("Resource_4hrip")

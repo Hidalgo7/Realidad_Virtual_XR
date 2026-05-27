@@ -1,0 +1,24 @@
+[gd_scene load_steps=4 format=3 uid="uid://cr8nndlfdtqfv"]
+
+[ext_resource type="PackedScene" uid="uid://xksxcu1n7hww" path="res://scenes/truck.tscn" id="1_monpu"]
+[ext_resource type="Script" uid="uid://cnlfbhq6srn65" path="res://scripts/path_follow_3d.gd" id="1_y46t4"]
+
+[sub_resource type="Curve3D" id="Curve3D_nybxu"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0.985, 0, 0, 0, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, -6, 0, -5),
+"tilts": PackedFloat32Array(0, 0, 0)
+}
+point_count = 3
+
+[node name="TruckPath" type="Path3D"]
+curve = SubResource("Curve3D_nybxu")
+
+[node name="PathFollow3D" type="PathFollow3D" parent="."]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 0, 0, 0)
+rotation_mode = 4
+script = ExtResource("1_y46t4")
+
+[node name="Pivot" type="Node3D" parent="PathFollow3D"]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
+
+[node name="Truck" parent="PathFollow3D/Pivot" instance=ExtResource("1_monpu")]
