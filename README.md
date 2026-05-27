@@ -122,3 +122,4 @@ EHU/UPV - Curso 2025-2026.
 - https://godotengine.org/
 - https://www.khronos.org/openxr/
 - https://github.com/GodotVR/godot-xr-tools
+- https://kaylousberg.itch.io/city-builder-bits
